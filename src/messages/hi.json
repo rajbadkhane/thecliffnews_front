@@ -1,0 +1,71 @@
+{
+  "nav": {
+    "home": "होम",
+    "quickReads": "त्वरित समाचार",
+    "videoBytes": "वीडियो बाइट्स",
+    "epaper": "ई-पेपर",
+    "highlights": "मुख्य बातें",
+    "categories": "श्रेणियाँ",
+    "search": "खोजें",
+    "menu": "मेनू",
+    "language": "भाषा",
+    "darkMode": "डार्क मोड",
+    "lightMode": "लाइट मोड"
+  },
+  "home": {
+    "breakingNews": "ब्रेकिंग न्यूज़",
+    "topStories": "मुख्य समाचार",
+    "latestNews": "ताज़ा समाचार",
+    "trending": "ट्रेंडिंग",
+    "viewAll": "सभी देखें",
+    "readMore": "और पढ़ें",
+    "shareArticle": "शेयर करें",
+    "listenToArticle": "सुनें",
+    "pauseReading": "रोकें"
+  },
+  "article": {
+    "minRead": "{minutes} मिनट में पढ़ें",
+    "publishedOn": "प्रकाशित",
+    "updatedOn": "अपडेट",
+    "author": "लेखक: {author}",
+    "share": "शेयर करें",
+    "listen": "सुनें",
+    "relatedArticles": "संबंधित समाचार"
+  },
+  "quickReads": {
+    "title": "त्वरित समाचार",
+    "subtitle": "60 शब्दों में समाचार",
+    "swipeForMore": "और के लिए स्वाइप करें",
+    "endOfFeed": "सभी समाचार पढ़ लिए!"
+  },
+  "epaper": {
+    "title": "ई-पेपर",
+    "todaysEdition": "आज का संस्करण",
+    "selectDate": "तारीख चुनें",
+    "hindiEdition": "हिंदी संस्करण",
+    "englishEdition": "अंग्रेज़ी संस्करण",
+    "download": "डाउनलोड",
+    "read": "पढ़ें",
+    "archive": "पुरालेख"
+  },
+  "categories": {
+    "national": "राष्ट्रीय",
+    "international": "अंतर्राष्ट्रीय",
+    "politics": "राजनीति",
+    "business": "व्यापार",
+    "sports": "खेल",
+    "entertainment": "मनोरंजन",
+    "technology": "प्रौद्योगिकी",
+    "science": "विज्ञान",
+    "lifestyle": "जीवनशैली",
+    "health": "स्वास्थ्य"
+  },
+  "common": {
+    "loading": "लोड हो रहा है...",
+    "error": "कुछ गलत हो गया",
+    "tryAgain": "फिर कोशिश करें",
+    "noResults": "कोई परिणाम नहीं मिला",
+    "comingSoon": "जल्द आ रहा है",
+    "back": "वापस"
+  }
+}

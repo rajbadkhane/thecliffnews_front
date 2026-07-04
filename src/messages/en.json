@@ -1,0 +1,71 @@
+{
+  "nav": {
+    "home": "Home",
+    "quickReads": "Quick Reads",
+    "videoBytes": "Video Bytes",
+    "epaper": "E-Paper",
+    "highlights": "Highlights",
+    "categories": "Categories",
+    "search": "Search",
+    "menu": "Menu",
+    "language": "Language",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode"
+  },
+  "home": {
+    "breakingNews": "Breaking News",
+    "topStories": "Top Stories",
+    "latestNews": "Latest News",
+    "trending": "Trending Now",
+    "viewAll": "View All",
+    "readMore": "Read More",
+    "shareArticle": "Share Article",
+    "listenToArticle": "Listen to Article",
+    "pauseReading": "Pause Reading"
+  },
+  "article": {
+    "minRead": "{minutes} min read",
+    "publishedOn": "Published on",
+    "updatedOn": "Updated on",
+    "author": "By {author}",
+    "share": "Share",
+    "listen": "Listen",
+    "relatedArticles": "Related Articles"
+  },
+  "quickReads": {
+    "title": "Quick Reads",
+    "subtitle": "News in 60 words",
+    "swipeForMore": "Swipe for more",
+    "endOfFeed": "You're all caught up!"
+  },
+  "epaper": {
+    "title": "E-Paper",
+    "todaysEdition": "Today's Edition",
+    "selectDate": "Select Date",
+    "hindiEdition": "Hindi Edition",
+    "englishEdition": "English Edition",
+    "download": "Download",
+    "read": "Read",
+    "archive": "Archive"
+  },
+  "categories": {
+    "national": "National",
+    "international": "International",
+    "politics": "Politics",
+    "business": "Business",
+    "sports": "Sports",
+    "entertainment": "Entertainment",
+    "technology": "Technology",
+    "science": "Science",
+    "lifestyle": "Lifestyle",
+    "health": "Health"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "tryAgain": "Try Again",
+    "noResults": "No results found",
+    "comingSoon": "Coming Soon",
+    "back": "Back"
+  }
+}

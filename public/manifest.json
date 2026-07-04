@@ -1,0 +1,21 @@
+{
+  "name": "The Cliff News",
+  "short_name": "CliffNews",
+  "description": "Stay updated with the latest breaking news, politics, entertainment, sports, and more from The Cliff News.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#f97316",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

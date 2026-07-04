@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.thecliffnews",
+      "sha256_cert_fingerprints": ["CC:22:2E:8B:2D:5E:07:5B:E5:6E:DE:A6:26:5F:73:4F:97:D6:AD:C6:5A:54:77:83:28:F6:6F:1F:4E:20:F2:E0"]
+    }
+  }
+]

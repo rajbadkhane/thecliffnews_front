@@ -1,0 +1,496 @@
+import { useState, useEffect } from 'react';
+import { articlesApi, Article, ArticleFilters, CreateArticleData, UpdateArticleData, NIT, NITFilters, mockNITs } from '../services';
+
+// Mock data for development
+const mockArticles: Article[] = [
+  {
+    id: '1',
+    title: 'Breaking: Revolutionary Climate Technology Breakthrough Announced',
+    slug: 'climate-technology-breakthrough',
+    excerpt: 'Scientists announce major breakthrough in carbon capture technology that could revolutionize climate change mitigation efforts globally.',
+    content: 'Full article content here...',
+    featuredImage: '/api/placeholder/800/400',
+    author: {
+      name: 'The Cliff News Team'
+    },
+    category: {
+      name: 'Science',
+      slug: 'science',
+      color: 'blue'
+    },
+    publishedAt: '2024-09-28T10:00:00Z',
+    updatedAt: '2024-09-28T10:00:00Z',
+    isBreaking: true,
+    isTopStory: true,
+    status: 'PUBLISHED',
+    tags: 'climate,technology,science',
+    readTime: 5,
+    viewCount: 125000,
+    shareCount: 850,
+    commentCount: 120,
+    language: 'ENGLISH'
+  },
+  {
+    id: '2',
+    title: 'Global Economic Summit Reaches Historic Trade Agreement',
+    slug: 'global-economic-summit-trade-agreement',
+    excerpt: 'World leaders reach consensus on new trade agreements that promise to reshape global commerce and economic cooperation.',
+    featuredImage: '/api/placeholder/800/400',
+    author: {
+      id: '2',
+      name: 'Business Desk',
+      avatar: '/api/placeholder/40/40'
+    },
+    category: {
+      id: '2',
+      name: 'Business',
+      slug: 'business'
+    },
+    publishedAt: '2024-09-28T09:00:00Z',
+    updatedAt: '2024-09-28T09:00:00Z',
+    isFeatured: true,
+    isBreaking: false,
+    tags: ['business', 'economy', 'trade'],
+    readTime: 7,
+    views: 89000,
+    language: 'ENGLISH'
+  },
+  {
+    id: '3',
+    title: 'Sports Championship Finals Draw Record-Breaking Viewership',
+    slug: 'championship-finals-record-viewership',
+    excerpt: 'Historic match draws unprecedented viewership numbers as fans worldwide tune in for the thrilling championship finale.',
+    featuredImage: '/api/placeholder/800/400',
+    author: {
+      id: '3',
+      name: 'Sports Reporter',
+      avatar: '/api/placeholder/40/40'
+    },
+    category: {
+      id: '3',
+      name: 'Sports',
+      slug: 'sports'
+    },
+    publishedAt: '2024-09-28T08:00:00Z',
+    updatedAt: '2024-09-28T08:00:00Z',
+    isFeatured: true,
+    isBreaking: false,
+    tags: ['sports', 'championship', 'entertainment'],
+    readTime: 4,
+    views: 67000,
+    language: 'ENGLISH'
+  },
+  {
+    id: '4',
+    title: 'AI Innovation Transforms Healthcare Diagnostics',
+    slug: 'ai-innovation-healthcare-diagnostics',
+    excerpt: 'Revolutionary AI technology improves diagnostic accuracy and speeds up medical treatment processes across hospitals.',
+    featuredImage: '/api/placeholder/800/400',
+    author: {
+      id: '4',
+      name: 'Health Correspondent',
+      avatar: '/api/placeholder/40/40'
+    },
+    category: {
+      id: '4',
+      name: 'Technology',
+      slug: 'technology'
+    },
+    publishedAt: '2024-09-28T07:00:00Z',
+    updatedAt: '2024-09-28T07:00:00Z',
+    isFeatured: false,
+    isBreaking: false,
+    tags: ['ai', 'healthcare', 'technology'],
+    readTime: 6,
+    views: 45000,
+    language: 'ENGLISH'
+  },
+  {
+    id: '5',
+    title: 'Cultural Festival Celebrates Global Unity',
+    slug: 'cultural-festival-global-unity',
+    excerpt: 'Annual international festival brings together diverse communities in a celebration of cultural heritage and unity.',
+    featuredImage: '/api/placeholder/800/400',
+    author: {
+      id: '5',
+      name: 'Culture Reporter',
+      avatar: '/api/placeholder/40/40'
+    },
+    category: {
+      id: '5',
+      name: 'Entertainment',
+      slug: 'entertainment'
+    },
+    publishedAt: '2024-09-28T06:00:00Z',
+    updatedAt: '2024-09-28T06:00:00Z',
+    isFeatured: false,
+    isBreaking: false,
+    tags: ['culture', 'festival', 'community'],
+    readTime: 3,
+    views: 23000,
+    language: 'ENGLISH'
+  },
+  {
+    id: '6',
+    title: 'राष्ट्रीय नीति में महत्वपूर्ण बदलाव',
+    slug: 'national-policy-important-changes',
+    excerpt: 'सरकार द्वारा घोषित नई राष्ट्रीय नीति से देश की दिशा में महत्वपूर्ण परिवर्तन की उम्मीद।',
+    featuredImage: '/api/placeholder/800/400',
+    author: {
+      id: '6',
+      name: 'राजनीतिक संवाददाता',
+      avatar: '/api/placeholder/40/40'
+    },
+    category: {
+      id: '6',
+      name: 'Politics',
+      slug: 'politics'
+    },
+    publishedAt: '2024-09-28T05:00:00Z',
+    updatedAt: '2024-09-28T05:00:00Z',
+    isFeatured: false,
+    isBreaking: false,
+    tags: ['politics', 'policy', 'government'],
+    readTime: 5,
+    views: 34000,
+    language: 'hi'
+  },
+  {
+    id: '7',
+    title: 'International Space Mission Achieves Major Milestone',
+    slug: 'international-space-mission-milestone',
+    excerpt: 'Collaborative international space mission reaches significant milestone in deep space exploration and research.',
+    featuredImage: '/api/placeholder/800/400',
+    author: {
+      id: '7',
+      name: 'Science Correspondent',
+      avatar: '/api/placeholder/40/40'
+    },
+    category: {
+      id: '7',
+      name: 'World',
+      slug: 'world'
+    },
+    publishedAt: '2024-09-28T04:00:00Z',
+    updatedAt: '2024-09-28T04:00:00Z',
+    isFeatured: false,
+    isBreaking: false,
+    tags: ['space', 'international', 'science'],
+    readTime: 8,
+    views: 56000,
+    language: 'ENGLISH'
+  },
+  {
+    id: '8',
+    title: 'National Infrastructure Development Update',
+    slug: 'national-infrastructure-development',
+    excerpt: 'Major infrastructure projects across the nation show significant progress toward completion and modernization.',
+    featuredImage: '/api/placeholder/800/400',
+    author: {
+      id: '8',
+      name: 'Infrastructure Reporter',
+      avatar: '/api/placeholder/40/40'
+    },
+    category: {
+      id: '8',
+      name: 'National',
+      slug: 'national'
+    },
+    publishedAt: '2024-09-28T03:00:00Z',
+    updatedAt: '2024-09-28T03:00:00Z',
+    isFeatured: false,
+    isBreaking: false,
+    tags: ['infrastructure', 'development', 'national'],
+    readTime: 6,
+    views: 41000,
+    language: 'ENGLISH'
+  }
+];
+
+// Custom hooks using React's built-in state management
+export const useArticles = (filters?: ArticleFilters) => {
+    const [data, setData] = useState<{ articles: Article[]; total: number; pages: number } | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
+
+    useEffect(() => {
+        const fetchArticles = async () => {
+            try {
+                setIsLoading(true);
+                setError(null);
+
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                // Filter mock data based on filters
+                let filteredArticles = [...mockArticles];
+
+                if (filters?.category) {
+                    filteredArticles = filteredArticles.filter(article =>
+                        article.category.name.toLowerCase() === filters.category?.toLowerCase() ||
+                        article.category.slug.toLowerCase() === filters.category?.toLowerCase()
+                    );
+                }
+
+                if (filters?.isFeatured !== undefined) {
+                    filteredArticles = filteredArticles.filter(article => article.isFeatured === filters.isFeatured);
+                }
+
+                if (filters?.isBreaking !== undefined) {
+                    filteredArticles = filteredArticles.filter(article => article.isBreaking === filters.isBreaking);
+                }
+
+                if (filters?.language) {
+                    filteredArticles = filteredArticles.filter(article => article.language === filters.language);
+                }
+
+                if (filters?.search) {
+                    const searchTerm = filters.search.toLowerCase();
+                    filteredArticles = filteredArticles.filter(article =>
+                        article.title.toLowerCase().includes(searchTerm) ||
+                        article.excerpt.toLowerCase().includes(searchTerm)
+                    );
+                }
+
+                const limit = filters?.limit || filteredArticles.length;
+                const paginatedArticles = filteredArticles.slice(0, limit);
+
+                setData({
+                    articles: paginatedArticles,
+                    total: filteredArticles.length,
+                    pages: Math.ceil(filteredArticles.length / limit)
+                });
+            } catch (err) {
+                setError(err instanceof Error ? err : new Error('Unknown error'));
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchArticles();
+    }, [filters?.category, filters?.isFeatured, filters?.isBreaking, filters?.language, filters?.search, filters?.limit]);
+
+    return { data, isLoading, error };
+};
+
+export const useArticle = (id: string) => {
+    const [data, setData] = useState<{ article: Article } | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
+
+    useEffect(() => {
+        if (!id) return;
+
+        const fetchArticle = async () => {
+            try {
+                setIsLoading(true);
+                setError(null);
+
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 300));
+
+                const article = mockArticles.find(a => a.id === id);
+                if (article) {
+                    setData({ article });
+                } else {
+                    throw new Error('Article not found');
+                }
+            } catch (err) {
+                setError(err instanceof Error ? err : new Error('Unknown error'));
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchArticle();
+    }, [id]);
+
+    return { data, isLoading, error };
+};
+
+export const useArticleBySlug = (slug: string) => {
+    const [data, setData] = useState<{ article: Article } | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
+
+    useEffect(() => {
+        if (!slug) return;
+
+        const fetchArticle = async () => {
+            try {
+                setIsLoading(true);
+                setError(null);
+
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 300));
+
+                const article = mockArticles.find(a => a.slug === slug);
+                if (article) {
+                    setData({ article });
+                } else {
+                    throw new Error('Article not found');
+                }
+            } catch (err) {
+                setError(err instanceof Error ? err : new Error('Unknown error'));
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchArticle();
+    }, [slug]);
+
+    return { data, isLoading, error };
+};
+
+export const useInshorts = (options?: { limit?: number }) => {
+    const [data, setData] = useState<{ inshorts: Article[] } | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
+
+    useEffect(() => {
+        const fetchInshorts = async () => {
+            try {
+                setIsLoading(true);
+                setError(null);
+
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 600));
+
+                const limit = options?.limit || 5;
+                const inshorts = mockArticles.slice(0, limit);
+
+                setData({ inshorts });
+            } catch (err) {
+                setError(err instanceof Error ? err : new Error('Unknown error'));
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchInshorts();
+    }, [options?.limit]);
+
+    return { data, isLoading, error };
+};
+
+export const useBreakingNews = (limit?: number) => {
+    const [data, setData] = useState<{ articles: Article[] } | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
+
+    useEffect(() => {
+        const fetchBreaking = async () => {
+            try {
+                setIsLoading(true);
+                setError(null);
+
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 400));
+
+                const breakingArticles = mockArticles.filter(article => article.isBreaking);
+                const limitedArticles = limit ? breakingArticles.slice(0, limit) : breakingArticles;
+
+                setData({ articles: limitedArticles });
+            } catch (err) {
+                setError(err instanceof Error ? err : new Error('Unknown error'));
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchBreaking();
+    }, [limit]);
+
+    return { data, isLoading, error };
+};
+
+export const useTopStories = (limit?: number) => {
+    const [data, setData] = useState<{ topStories: Article[] } | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
+
+    useEffect(() => {
+        const fetchTopStories = async () => {
+            try {
+                setIsLoading(true);
+                setError(null);
+
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                const featuredArticles = mockArticles.filter(article => article.isFeatured);
+                const limitedArticles = limit ? featuredArticles.slice(0, limit) : featuredArticles;
+
+                setData({ topStories: limitedArticles });
+            } catch (err) {
+                setError(err instanceof Error ? err : new Error('Unknown error'));
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchTopStories();
+    }, [limit]);
+
+    return { data, isLoading, error };
+};
+
+export const useNIT = (filters?: NITFilters) => {
+    const [data, setData] = useState<{ nits: NIT[] } | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
+
+    useEffect(() => {
+        const fetchNITs = async () => {
+            try {
+                setIsLoading(true);
+                setError(null);
+
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                // Filter mock data based on filters
+                let filteredNITs = [...mockNITs];
+
+                if (filters?.category) {
+                    filteredNITs = filteredNITs.filter(nit =>
+                        nit.category.toLowerCase() === filters.category?.toLowerCase()
+                    );
+                }
+
+                if (filters?.department) {
+                    filteredNITs = filteredNITs.filter(nit =>
+                        nit.department.toLowerCase().includes(filters.department?.toLowerCase() || '')
+                    );
+                }
+
+                if (filters?.status) {
+                    filteredNITs = filteredNITs.filter(nit => nit.status === filters.status);
+                }
+
+                if (filters?.search) {
+                    const searchTerm = filters.search.toLowerCase();
+                    filteredNITs = filteredNITs.filter(nit =>
+                        nit.title.toLowerCase().includes(searchTerm) ||
+                        nit.description.toLowerCase().includes(searchTerm) ||
+                        nit.department.toLowerCase().includes(searchTerm)
+                    );
+                }
+
+                const limit = filters?.limit || filteredNITs.length;
+                const limitedNITs = filteredNITs.slice(0, limit);
+
+                setData({ nits: limitedNITs });
+            } catch (err) {
+                setError(err instanceof Error ? err : new Error('Unknown error'));
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchNITs();
+    }, [filters?.category, filters?.department, filters?.status, filters?.search, filters?.limit]);
+
+    return { data, isLoading, error };
+};
