@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { AnimatePresence } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
@@ -27,41 +27,50 @@ interface InshortItem {
   slug?: string;
 }
 
-const QuickReadsClient = () => {
+interface QuickReadsClientProps {
+  initialQuickReads?: InshortItem[];
+}
+
+const QuickReadsClient = ({ initialQuickReads = [] }: QuickReadsClientProps) => {
   const params = useParams();
   const router = useRouter();
   const locale = params.locale as string || 'en';
   const language = locale === 'hi' ? 'HINDI' : 'ENGLISH';
 
-  const [quickReads, setQuickReads] = useState<InshortItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [quickReads, setQuickReads] = useState<InshortItem[]>(initialQuickReads);
+  const [isLoading, setIsLoading] = useState(initialQuickReads.length === 0);
   const [error, setError] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
+  const hasMountedRef = useRef(false);
+
   useEffect(() => {
-    const fetchQuickReads = async () => {
-      try {
-        setIsLoading(true);
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/inshorts?limit=20&language=${language}`);
+    if (initialQuickReads.length === 0 || hasMountedRef.current) {
+      const fetchQuickReads = async () => {
+        try {
+          setIsLoading(true);
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/inshorts?limit=20&language=${language}`);
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch quick reads');
+          if (!response.ok) {
+            throw new Error('Failed to fetch quick reads');
+          }
+
+          const data = await response.json();
+          setQuickReads(data.inshorts || []);
+        } catch (error) {
+          console.error('Error fetching quick reads:', error);
+          setError('Failed to load quick reads');
+        } finally {
+          setIsLoading(false);
         }
+      };
 
-        const data = await response.json();
-        setQuickReads(data.inshorts || []);
-      } catch (error) {
-        console.error('Error fetching quick reads:', error);
-        setError('Failed to load quick reads');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchQuickReads();
-  }, [language]);
+      fetchQuickReads();
+    }
+    hasMountedRef.current = true;
+  }, [language, initialQuickReads.length]);
 
   const handleSwipeUp = () => {
     if (currentIndex < quickReads.length - 1) {

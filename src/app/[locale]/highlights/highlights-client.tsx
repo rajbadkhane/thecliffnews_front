@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { ArrowLeft, Images, Calendar, Loader2 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -33,15 +33,20 @@ interface HighlightData {
   shareCount?: number;
 }
 
-const HighlightsClient = () => {
+interface HighlightsClientProps {
+  initialHighlights?: ImageItem[];
+  initialTotalPages?: number;
+}
+
+const HighlightsClient = ({ initialHighlights = [], initialTotalPages = 1 }: HighlightsClientProps) => {
   const params = useParams();
   const router = useRouter();
   const locale = params.locale as string || 'en';
 
-  const [highlights, setHighlights] = useState<ImageItem[]>([]);
+  const [highlights, setHighlights] = useState<ImageItem[]>(initialHighlights);
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [isLoading, setIsLoading] = useState(true);
+  const [totalPages, setTotalPages] = useState(initialTotalPages);
+  const [isLoading, setIsLoading] = useState(initialHighlights.length === 0);
   const [error, setError] = useState<string | null>(null);
 
   // Date filter state
@@ -95,9 +100,14 @@ const HighlightsClient = () => {
   }, [startDate, endDate]);
 
   // Initial fetch on mount
+  const hasMountedRef = useRef(false);
+
   useEffect(() => {
-    fetchHighlights(1);
-  }, [fetchHighlights]);
+    if (initialHighlights.length === 0 || hasMountedRef.current || startDate || endDate) {
+      fetchHighlights(1);
+    }
+    hasMountedRef.current = true;
+  }, [fetchHighlights, startDate, endDate, initialHighlights.length]);
 
   // Handle page change
   const handlePageChange = (newPage: number) => {

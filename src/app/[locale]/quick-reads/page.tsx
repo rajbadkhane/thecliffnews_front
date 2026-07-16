@@ -40,6 +40,22 @@ export async function generateStaticParams() {
   ];
 }
 
+async function getInitialQuickReads(locale: string) {
+  const language = locale === 'hi' ? 'HINDI' : 'ENGLISH';
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL || 'https://api.thecliffnews.in'}/api/inshorts?limit=20&language=${language}`,
+      { next: { revalidate: 60 } } // Cache for 1 minute
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.inshorts || [];
+  } catch (error) {
+    console.error('Error fetching server quick reads:', error);
+    return [];
+  }
+}
+
 export default async function QuickReadsPage({ params }: PageProps) {
   const { locale } = await params;
 
@@ -48,5 +64,7 @@ export default async function QuickReadsPage({ params }: PageProps) {
     notFound();
   }
 
-  return <QuickReadsClient />;
+  const initialQuickReads = await getInitialQuickReads(locale);
+
+  return <QuickReadsClient initialQuickReads={initialQuickReads} />;
 }
