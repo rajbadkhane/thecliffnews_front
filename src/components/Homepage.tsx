@@ -39,8 +39,13 @@ const Homepage = async ({ locale = "en" }: { locale?: string }) => {
   // Filter articles by category for hero section
   const articles: Article[] = articlesData?.articles || [];
 
+  const h1Text = locale === "hi"
+    ? "द क्लिफ न्यूज़: हिंदी समाचार और भोपाल की ताज़ा ख़बरें"
+    : "The Cliff News: Hindi & English News, Bhopal Updates";
+
   return (
     <div className="min-h-screen bg-background">
+      <h1 className="sr-only">{h1Text}</h1>
       {/* Live Market Ticker */}
       <ScrollingTicker />
 

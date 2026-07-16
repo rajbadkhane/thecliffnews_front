@@ -127,9 +127,9 @@ const EnhancedHeroSection = ({
             </div>
 
             {/* Title */}
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-4 leading-normal tracking-tight">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4 leading-normal tracking-tight">
               {currentArticle.title}
-            </h1>
+            </h2>
 
             {/* Excerpt */}
             <p className="text-base md:text-lg text-muted-foreground mb-6 leading-relaxed">
@@ -227,9 +227,9 @@ const EnhancedHeroSection = ({
             </div>
 
             {/* Title */}
-            <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4 max-w-3xl animate-fade-in-up leading-normal">
+            <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4 max-w-3xl animate-fade-in-up leading-normal">
               {currentArticle.title}
-            </h1>
+            </h2>
 
             {/* Excerpt */}
             <p className="text-lg text-white/90 mb-6 max-w-2xl animate-fade-in-up leading-relaxed">
