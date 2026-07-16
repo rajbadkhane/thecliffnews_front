@@ -45,7 +45,7 @@ const Homepage = async ({ locale = "en" }: { locale?: string }) => {
       <ScrollingTicker />
 
       {/* Enhanced Hero Section */}
-      <EnhancedHeroSection featuredArticles={articles} />
+      <EnhancedHeroSection featuredArticles={articles} locale={locale} />
 
       {/* Top Stories - Full Width */}
       <section className="py-16 bg-gray-50 dark:bg-gray-900/50">
@@ -65,7 +65,7 @@ const Homepage = async ({ locale = "en" }: { locale?: string }) => {
           {/* Enhanced Top Stories Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {(topStoriesData?.topStories || []).map((article) => (
-              <NewsCard key={article.id} article={article} variant="featured" />
+              <NewsCard key={article.id} article={article} variant="featured" locale={locale} />
             ))}
           </div>
         </div>
@@ -114,6 +114,7 @@ const Homepage = async ({ locale = "en" }: { locale?: string }) => {
       <DynamicCategorySections
         language={language}
         excludeCategories={[]} // Show all categories
+        locale={locale}
       />
 
       {/* Video Bytes Section */}

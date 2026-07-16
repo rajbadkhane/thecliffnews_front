@@ -15,6 +15,7 @@ interface EnhancedCategorySectionProps {
   backgroundColor?: "default" | "muted" | "accent";
   maxArticles?: number;
   categorySlug?: string;
+  locale?: string;
 }
 
 const EnhancedCategorySection = ({
@@ -25,8 +26,10 @@ const EnhancedCategorySection = ({
   backgroundColor = "default",
   maxArticles = 5,
   categorySlug,
+  locale: propLocale,
 }: EnhancedCategorySectionProps) => {
-  const locale = useLocale();
+  const nextIntlLocale = useLocale();
+  const locale = propLocale || nextIntlLocale;
   const backgroundClasses = {
     default: "",
     muted: "bg-muted/30",
@@ -96,13 +99,13 @@ const EnhancedCategorySection = ({
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       {/* Main Featured Article */}
       <div className="lg:col-span-1">
-        <NewsCard article={displayArticles[0]} variant="featured" />
+        <NewsCard article={displayArticles[0]} variant="featured" locale={locale} />
       </div>
 
       {/* Secondary Articles */}
       <div className="space-y-6">
         {displayArticles.slice(1, maxArticles).map((article) => (
-          <NewsCard key={article.id} article={article} variant="compact" />
+          <NewsCard key={article.id} article={article} variant="compact" locale={locale} />
         ))}
       </div>
     </div>
@@ -112,14 +115,14 @@ const EnhancedCategorySection = ({
     <div className="grid grid-cols-1 gap-8">
       {/* Hero Article */}
       <div className="lg:col-span-2">
-        <NewsCard article={displayArticles[0]} variant="featured" />
+        <NewsCard article={displayArticles[0]} variant="featured" locale={locale} />
       </div>
 
       {/* Supporting Articles */}
       {displayArticles.length > 1 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {displayArticles.slice(1, maxArticles).map((article) => (
-            <NewsCard key={article.id} article={article} />
+            <NewsCard key={article.id} article={article} locale={locale} />
           ))}
         </div>
       )}
@@ -129,7 +132,7 @@ const EnhancedCategorySection = ({
   const renderGridLayout = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {displayArticles.map((article) => (
-        <NewsCard key={article.id} article={article} variant="dw-style" />
+        <NewsCard key={article.id} article={article} variant="dw-style" locale={locale} />
       ))}
     </div>
   );

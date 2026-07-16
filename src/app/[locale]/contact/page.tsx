@@ -3,11 +3,38 @@ import { Mail, Phone, MapPin, MessageCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import ContactForm from "./ContactForm";
 
-export const metadata: Metadata = {
-  title: "Contact Us",
-  description:
-    "Get in touch with The Cliff News team. We value your feedback, story tips, and partnership ideas.",
-};
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const isHi = locale === 'hi';
+
+  const title = isHi ? 'संपर्क करें' : 'Contact Us';
+  const description = isHi
+    ? 'द क्लिफ न्यूज़ टीम से संपर्क करें। हम आपकी प्रतिक्रिया, समाचार सुझावों और साझेदारी के विचारों का स्वागत करते हैं।'
+    : 'Get in touch with The Cliff News team. We value your feedback, story tips, and partnership ideas.';
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `/${locale}/contact`,
+      languages: {
+        en: '/en/contact',
+        hi: '/hi/contact',
+      },
+    },
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      locale: isHi ? 'hi_IN' : 'en_US',
+      url: `https://www.thecliffnews.in/${locale}/contact`,
+    },
+  };
+}
 
 const CONTACT = {
   email: "Thecliffnewspaper@gmail.com",

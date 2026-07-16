@@ -27,6 +27,7 @@ import { useLocale } from "next-intl";
 import { articlesApi } from "@/services/articles";
 import type { Article } from "@/services/articles";
 import { formatTimeAgo } from "@/lib/formatTimeAgo";
+import { getArticleUrl } from "@/lib/slug";
 
 // Navigation item interface
 interface NavigationItem {
@@ -57,15 +58,66 @@ const Header = () => {
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [downloadOpen, setDownloadOpen] = useState(false);
+  const [categoriesOpen, setCategoriesOpen] = useState(false);
+  const [mobileDownloadOpen, setMobileDownloadOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const mobileSearchRef = useRef<HTMLDivElement>(null);
+  const downloadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const categoriesTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleDownloadMouseEnter = () => {
+    if (downloadTimeoutRef.current) clearTimeout(downloadTimeoutRef.current);
+    setDownloadOpen(true);
+  };
+
+  const handleDownloadMouseLeave = () => {
+    downloadTimeoutRef.current = setTimeout(() => {
+      setDownloadOpen(false);
+    }, 150); // 150ms buffer to prevent lag/accidental closures
+  };
+
+  const handleCategoriesMouseEnter = () => {
+    if (categoriesTimeoutRef.current) clearTimeout(categoriesTimeoutRef.current);
+    setCategoriesOpen(true);
+  };
+
+  const handleCategoriesMouseLeave = () => {
+    categoriesTimeoutRef.current = setTimeout(() => {
+      setCategoriesOpen(false);
+    }, 150); // 150ms buffer to prevent lag/accidental closures
+  };
 
   // Avoid hydration mismatch by waiting for component to mount
   useEffect(() => {
     setMounted(true);
+    return () => {
+      if (downloadTimeoutRef.current) clearTimeout(downloadTimeoutRef.current);
+      if (categoriesTimeoutRef.current) clearTimeout(categoriesTimeoutRef.current);
+    };
   }, []);
   const pathname = usePathname();
   const currentLocale = useLocale();
+
+  const headerT = {
+    en: {
+      download: "Download App",
+      android: "Android App",
+      ios: "iOS App",
+      details: "Details & QR Code"
+    },
+    hi: {
+      download: "ऐप डाउनलोड करें",
+      android: "एंड्रॉइड ऐप",
+      ios: "आईओएस ऐप",
+      details: "विवरण और क्यूआर कोड"
+    }
+  }[currentLocale as 'en' | 'hi'] || {
+    download: "Download App",
+    android: "Android App",
+    ios: "iOS App",
+    details: "Details & QR Code"
+  };
 
   // Handle scroll effect
   useEffect(() => {
@@ -143,7 +195,7 @@ const Header = () => {
             {searchResults.map((article) => (
               <Link
                 key={article.id}
-                href={`/${currentLocale}/article/${article.slug}`}
+                href={getArticleUrl(currentLocale, article)}
                 className="flex items-start gap-3 px-4 py-3 hover:bg-muted transition-colors"
                 onClick={clearSearch}
               >
@@ -243,32 +295,39 @@ const Header = () => {
               Home
             </Link>
 
-            {/* Categories Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="font-medium text-foreground hover:text-primary flex items-center space-x-1 px-2 py-1 h-auto"
+            {/* Categories Hover Dropdown */}
+            <div
+              className="relative py-1"
+              onMouseEnter={handleCategoriesMouseEnter}
+              onMouseLeave={handleCategoriesMouseLeave}
+            >
+              <Button
+                variant="ghost"
+                className="font-medium text-foreground hover:text-primary flex items-center space-x-1 px-2 py-1 h-auto"
+              >
+                <span className="text-sm">Categories</span>
+                <ChevronDown className={cn("h-3 w-3 transition-transform duration-200", categoriesOpen ? "transform rotate-180" : "")} />
+              </Button>
+
+              {categoriesOpen && (
+                <div
+                  className="absolute left-0 mt-1.5 w-56 bg-popover border border-border shadow-md rounded-md p-2 z-[100] grid grid-cols-2 gap-1 transition-all duration-200 animate-in fade-in slide-in-from-top-1"
+                  onMouseEnter={handleCategoriesMouseEnter}
+                  onMouseLeave={handleCategoriesMouseLeave}
                 >
-                  <span className="text-sm">Categories</span>
-                  <ChevronDown className="h-3 w-3" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 bg-popover border-border shadow-lg rounded-lg" align="start">
-                <div className="grid grid-cols-2 gap-1 p-2">
                   {mockCategories.map((category) => (
-                    <DropdownMenuItem key={category.id} asChild>
-                      <Link
-                        href={`/${currentLocale}/category/${category.slug}`}
-                        className="flex items-center px-3 py-2 text-sm cursor-pointer text-popover-foreground hover:text-primary hover:bg-muted rounded-md transition-colors"
-                      >
-                        {category.name}
-                      </Link>
-                    </DropdownMenuItem>
+                    <Link
+                      key={category.id}
+                      href={`/${currentLocale}/category/${category.slug}`}
+                      className="flex items-center px-3 py-2 text-sm text-popover-foreground hover:text-primary hover:bg-muted rounded-md transition-colors"
+                      onClick={() => setCategoriesOpen(false)}
+                    >
+                      {category.name}
+                    </Link>
                   ))}
                 </div>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              )}
+            </div>
 
             <Link
               href={`/${currentLocale}/quick-reads`}
@@ -329,10 +388,82 @@ const Header = () => {
             >
               E-Paper
             </Link>
+
+            {/* App Download Hover Dropdown */}
+            <div
+              className="relative py-1"
+              onMouseEnter={handleDownloadMouseEnter}
+              onMouseLeave={handleDownloadMouseLeave}
+            >
+              <Button
+                variant="ghost"
+                className="font-medium text-foreground hover:text-primary flex items-center space-x-1 px-2 py-1 h-auto"
+              >
+                <span className="text-sm">{headerT.download}</span>
+                <ChevronDown className={cn("h-3 w-3 transition-transform duration-200", downloadOpen ? "transform rotate-180" : "")} />
+              </Button>
+
+              {downloadOpen && (
+                <div
+                  className="absolute left-0 mt-1.5 w-44 bg-popover border border-border shadow-md rounded-md p-1 z-[100] flex flex-col transition-all duration-200 animate-in fade-in slide-in-from-top-1"
+                  onMouseEnter={handleDownloadMouseEnter}
+                  onMouseLeave={handleDownloadMouseLeave}
+                >
+                  <a
+                    href="https://play.google.com/store/apps/details?id=com.thecliffnews"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center px-3 py-2 text-sm text-popover-foreground hover:text-primary hover:bg-muted rounded-md transition-colors"
+                  >
+                    {headerT.android}
+                  </a>
+                  <a
+                    href="https://apps.apple.com/us/app/the-cliff-news/id6746549944"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center px-3 py-2 text-sm text-popover-foreground hover:text-primary hover:bg-muted rounded-md transition-colors"
+                  >
+                    {headerT.ios}
+                  </a>
+                  <Link
+                    href={`/${currentLocale}/download`}
+                    className="flex items-center px-3 py-2 text-xs font-semibold text-primary hover:bg-muted rounded-md transition-colors border-t border-border/50 mt-1 pt-1"
+                  >
+                    {headerT.details}
+                  </Link>
+                </div>
+              )}
+            </div>
           </nav>
 
           {/* Right Side Controls */}
           <div className="flex items-center space-x-2 lg:space-x-4 flex-shrink-0">
+            {/* Language Switcher */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="flex items-center space-x-1 px-2"
+                >
+                  <Globe className="h-4 w-4" />
+                  <span className="text-xs font-medium uppercase">{currentLocale}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link href="/en" className="cursor-pointer">
+                    English
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/hi" className="cursor-pointer">
+                    हिंदी
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             {/* Theme Toggle - visible on all screen sizes */}
             <Button
               variant="ghost"
@@ -359,7 +490,7 @@ const Header = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onFocus={() => searchResults.length > 0 && setShowSearchDropdown(true)}
-                    className="pl-10 w-48 xl:w-64 h-9 bg-background border-border focus:border-primary focus:ring-primary"
+                    className="pl-10 w-32 xl:w-44 h-9 bg-background border-border focus:border-primary focus:ring-primary"
                   />
                   {searchQuery && (
                     <button
@@ -388,32 +519,6 @@ const Header = () => {
                 <Menu className="h-5 w-5" />
               )}
             </Button>
-
-            {/* Language Switcher */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="flex items-center space-x-1 px-2"
-                >
-                  <Globe className="h-4 w-4" />
-                  <span className="text-xs font-medium uppercase">{currentLocale}</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem asChild>
-                  <Link href="/en" className="cursor-pointer">
-                    English
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/hi" className="cursor-pointer">
-                    हिंदी
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
         </div>
       </div>
@@ -488,6 +593,46 @@ const Header = () => {
                     </Link>
                   );
                 })}
+
+                {/* Mobile Collapsible Download App Accordion */}
+                <div className="border-t border-border/50 pt-2 mt-2">
+                  <button
+                    onClick={() => setMobileDownloadOpen(!mobileDownloadOpen)}
+                    className="flex items-center justify-between w-full px-4 py-3 rounded-lg font-medium text-foreground hover:bg-muted hover:text-primary transition-colors text-left"
+                  >
+                    <span>{headerT.download}</span>
+                    <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", mobileDownloadOpen ? "transform rotate-180" : "")} />
+                  </button>
+                  {mobileDownloadOpen && (
+                    <div className="pl-6 pr-4 py-2 space-y-2 bg-muted/20 rounded-lg mt-1">
+                      <a
+                        href="https://play.google.com/store/apps/details?id=com.thecliffnews"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="block px-4 py-2.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                      >
+                        {headerT.android}
+                      </a>
+                      <a
+                        href="https://apps.apple.com/us/app/the-cliff-news/id6746549944"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="block px-4 py-2.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                      >
+                        {headerT.ios}
+                      </a>
+                      <Link
+                        href={`/${currentLocale}/download`}
+                        onClick={() => setIsMenuOpen(false)}
+                        className="block px-4 py-2.5 text-xs font-semibold text-primary hover:text-primary-hover transition-colors border-t border-border/50 pt-2.5 mt-1"
+                      >
+                        {headerT.details}
+                      </Link>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Categories Section */}

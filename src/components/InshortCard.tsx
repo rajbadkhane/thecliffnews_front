@@ -9,6 +9,7 @@ import { formatTimeAgo } from '@/lib/formatTimeAgo';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { appendShareSource } from '@/lib/share';
+import { getArticleUrl } from '@/lib/slug';
 
 interface InshortItem {
   id: string;
@@ -62,7 +63,7 @@ export function InshortCard({
 
   // Build the article URL based on locale
   const articleUrl = item.sourceArticle
-    ? `/${locale}/article/${item.sourceArticle.slug}?from=inshorts&index=${currentIndex}`
+    ? `${getArticleUrl(locale, item.sourceArticle)}?from=inshorts&index=${currentIndex}`
     : null;
 
   const handleShare = async () => {

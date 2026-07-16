@@ -18,22 +18,35 @@ interface ArticleContentProps {
   locale: string;
   isFromInshorts?: boolean;
   inshortsIndex?: string;
+  initialArticle?: Article;
 }
 
 export default function ArticleContent({
   slug,
   locale,
   isFromInshorts = false,
-  inshortsIndex
+  inshortsIndex,
+  initialArticle
 }: ArticleContentProps) {
   const t = useTranslations();
   const router = useRouter();
-  const [article, setArticle] = useState<Article | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [article, setArticle] = useState<Article | null>(initialArticle || null);
+  const [isLoading, setIsLoading] = useState(!initialArticle);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   useEffect(() => {
+    // Skip fetching if we already have the correct initialArticle matching current parameters
+    if (initialArticle && initialArticle.slug === slug) {
+      const isCorrectLanguage = (locale === 'hi' && initialArticle.language === 'HINDI') ||
+                               (locale === 'en' && initialArticle.language === 'ENGLISH');
+      if (isCorrectLanguage) {
+        setArticle(initialArticle);
+        setIsLoading(false);
+        return;
+      }
+    }
+
     const fetchArticle = async () => {
       try {
         const language = locale === 'hi' ? 'HINDI' : 'ENGLISH';
@@ -50,7 +63,7 @@ export default function ArticleContent({
     };
 
     fetchArticle();
-  }, [slug, locale]);
+  }, [slug, locale, initialArticle]);
 
   const handleBack = () => {
     if (isFromInshorts) {
@@ -290,7 +303,7 @@ export default function ArticleContent({
         </div>
 
         {/* Title */}
-        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-6">
+        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-normal mb-6">
           {article.title}
         </h1>
 

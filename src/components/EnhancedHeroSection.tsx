@@ -7,15 +7,19 @@ import Link from "next/link";
 import { useLocale } from "next-intl";
 import type { Article } from "@/services";
 import { formatTimeAgo } from "@/lib/formatTimeAgo";
+import { getArticleUrl } from "@/lib/slug";
 
 interface EnhancedHeroSectionProps {
   featuredArticles: Article[];
+  locale?: string;
 }
 
 const EnhancedHeroSection = ({
   featuredArticles,
+  locale: propLocale,
 }: EnhancedHeroSectionProps) => {
-  const locale = useLocale();
+  const nextIntlLocale = useLocale();
+  const locale = propLocale || nextIntlLocale;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlay, setIsAutoPlay] = useState(true);
 
@@ -123,7 +127,7 @@ const EnhancedHeroSection = ({
             </div>
 
             {/* Title */}
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-4 leading-tight tracking-tight">
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-4 leading-normal tracking-tight">
               {currentArticle.title}
             </h1>
 
@@ -152,7 +156,7 @@ const EnhancedHeroSection = ({
             </div>
 
             {/* CTA Button */}
-            <Link href={`/${locale}/article/${currentArticle.slug}`}>
+            <Link href={getArticleUrl(locale, currentArticle)}>
               <Button
                 size="lg"
                 className="bg-primary hover:bg-primary-hover text-primary-foreground font-semibold px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
@@ -223,7 +227,7 @@ const EnhancedHeroSection = ({
             </div>
 
             {/* Title */}
-            <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4 max-w-3xl animate-fade-in-up leading-tight">
+            <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4 max-w-3xl animate-fade-in-up leading-normal">
               {currentArticle.title}
             </h1>
 
@@ -250,7 +254,7 @@ const EnhancedHeroSection = ({
             </div>
 
             {/* CTA Button */}
-            <Link href={`/${locale}/article/${currentArticle.slug}`}>
+            <Link href={getArticleUrl(locale, currentArticle)}>
               <Button
                 size="lg"
                 className="bg-primary hover:bg-primary-hover text-primary-foreground font-medium animate-fade-in-up"

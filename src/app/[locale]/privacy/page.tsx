@@ -1,9 +1,37 @@
 import { Metadata } from 'next';
 
-export const metadata: Metadata = {
-  title: 'Privacy Policy',
-  description: 'Learn about our privacy policy and how we protect your personal information.',
-};
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const isHi = locale === 'hi';
+
+  const title = isHi ? 'गोपनीयता नीति' : 'Privacy Policy';
+  const description = isHi
+    ? 'हमारी गोपनीयता नीति के बारे में जानें और हम आपकी व्यक्तिगत जानकारी की सुरक्षा कैसे करते हैं।'
+    : 'Learn about our privacy policy and how we protect your personal information.';
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `/${locale}/privacy`,
+      languages: {
+        en: '/en/privacy',
+        hi: '/hi/privacy',
+      },
+    },
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      locale: isHi ? 'hi_IN' : 'en_US',
+      url: `https://www.thecliffnews.in/${locale}/privacy`,
+    },
+  };
+}
 
 export default function PrivacyPage() {
   return (

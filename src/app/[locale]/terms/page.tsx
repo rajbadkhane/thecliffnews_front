@@ -1,9 +1,37 @@
 import { Metadata } from 'next';
 
-export const metadata: Metadata = {
-  title: 'Terms of Service',
-  description: 'Terms and conditions for using The Cliff News website and services.',
-};
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const isHi = locale === 'hi';
+
+  const title = isHi ? 'सेवा की शर्तें' : 'Terms of Service';
+  const description = isHi
+    ? 'द क्लिफ न्यूज़ वेबसाइट और सेवाओं के उपयोग के लिए नियम और शर्तें।'
+    : 'Terms and conditions for using The Cliff News website and services.';
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `/${locale}/terms`,
+      languages: {
+        en: '/en/terms',
+        hi: '/hi/terms',
+      },
+    },
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      locale: isHi ? 'hi_IN' : 'en_US',
+      url: `https://www.thecliffnews.in/${locale}/terms`,
+    },
+  };
+}
 
 export default function TermsPage() {
   return (

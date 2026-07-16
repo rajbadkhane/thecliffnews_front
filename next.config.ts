@@ -55,6 +55,40 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source: '/about-us',
+        destination: '/en/about',
+        permanent: true,
+      },
+      {
+        source: '/how-to-download',
+        destination: '/en/download',
+        permanent: true,
+      },
+      {
+        source: '/playstore',
+        destination: 'https://play.google.com/store/apps/details?id=com.thecliffnews',
+        permanent: true,
+      },
+      {
+        source: '/app-store',
+        destination: 'https://apps.apple.com/us/app/the-cliff-news/id6746549944',
+        permanent: true,
+      },
+      {
+        source: '/:locale/about-us',
+        destination: '/:locale/about',
+        permanent: true,
+      },
+      {
+        source: '/:locale/how-to-download',
+        destination: '/:locale/download',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default withNextIntl(nextConfig);

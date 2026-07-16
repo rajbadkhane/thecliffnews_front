@@ -6,18 +6,21 @@ import Link from "next/link";
 import { useLocale } from "next-intl";
 import type { Article } from "@/services";
 import { formatTimeAgo } from "@/lib/formatTimeAgo";
+import { getArticleUrl } from "@/lib/slug";
 
 interface NewsCardProps {
   article: Article;
   variant?: "default" | "featured" | "compact" | "dw-style";
+  locale?: string;
 }
 
-const NewsCard = ({ article, variant = "default" }: NewsCardProps) => {
-  const locale = useLocale();
+const NewsCard = ({ article, variant = "default", locale: propLocale }: NewsCardProps) => {
+  const nextIntlLocale = useLocale();
+  const locale = propLocale || nextIntlLocale;
 
   if (variant === "compact") {
     return (
-      <Link href={`/${locale}/article/${article.slug}`}>
+      <Link href={getArticleUrl(locale, article)}>
         <article className="news-card p-4 transition-transform hover:scale-[1.02] cursor-pointer">
           <div className="flex space-x-4">
             <div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden flex-shrink-0">
@@ -42,7 +45,7 @@ const NewsCard = ({ article, variant = "default" }: NewsCardProps) => {
                   {article.category?.name || "Uncategorized"}
                 </span>
               </div>
-              <h3 className="font-semibold text-sm leading-tight mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+              <h3 className="font-semibold text-sm leading-normal mb-2 line-clamp-2 group-hover:text-primary transition-colors">
                 {article.title}
               </h3>
               <div className="flex items-center text-xs text-muted-foreground">
@@ -59,7 +62,7 @@ const NewsCard = ({ article, variant = "default" }: NewsCardProps) => {
 
   if (variant === "featured") {
     return (
-      <Link href={`/${locale}/article/${article.slug}`}>
+      <Link href={getArticleUrl(locale, article)}>
         <article className="group cursor-pointer h-full flex flex-col bg-white dark:bg-gray-900 rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-200 dark:border-gray-700">
           <div className="relative overflow-hidden">
             {/* Image container with fixed aspect ratio */}
@@ -91,7 +94,7 @@ const NewsCard = ({ article, variant = "default" }: NewsCardProps) => {
           </div>
 
           <div className="p-5 flex flex-col flex-grow">
-            <h2 className="text-lg font-bold mb-3 group-hover:text-blue-600 transition-colors line-clamp-2 leading-tight">
+            <h2 className="text-lg font-bold mb-3 group-hover:text-blue-600 transition-colors line-clamp-2 leading-normal">
               {article.title}
             </h2>
             <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3 flex-grow text-sm leading-relaxed">
@@ -120,7 +123,7 @@ const NewsCard = ({ article, variant = "default" }: NewsCardProps) => {
 
   if (variant === "dw-style") {
     return (
-      <Link href={`/${locale}/article/${article.slug}`}>
+      <Link href={getArticleUrl(locale, article)}>
         <article className="group cursor-pointer h-full relative overflow-hidden">
           {/* Full Image Background */}
           <div className="relative aspect-[4/3] overflow-hidden">
@@ -142,7 +145,7 @@ const NewsCard = ({ article, variant = "default" }: NewsCardProps) => {
               </div>
 
               {/* Title */}
-              <h3 className="text-white font-semibold text-base leading-tight mb-2 line-clamp-3 group-hover:text-blue-200 transition-colors">
+              <h3 className="text-white font-semibold text-base leading-normal mb-2 line-clamp-3 group-hover:text-blue-200 transition-colors">
                 {article.title}
               </h3>
 
@@ -167,7 +170,7 @@ const NewsCard = ({ article, variant = "default" }: NewsCardProps) => {
   }
 
   return (
-    <Link href={`/${locale}/article/${article.slug}`}>
+    <Link href={getArticleUrl(locale, article)}>
       <article className="group cursor-pointer h-full flex flex-col bg-white dark:bg-gray-900 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200 dark:border-gray-700">
         <div className="relative overflow-hidden">
           {/* Image container with aspect ratio */}
@@ -196,7 +199,7 @@ const NewsCard = ({ article, variant = "default" }: NewsCardProps) => {
         </div>
 
         <div className="p-4 flex flex-col flex-grow">
-          <h3 className="font-semibold text-base leading-tight mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
+          <h3 className="font-semibold text-base leading-normal mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
             {article.title}
           </h3>
           <p className="text-gray-600 dark:text-gray-300 mb-3 line-clamp-2 flex-grow text-sm">

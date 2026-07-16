@@ -6,13 +6,16 @@ import Link from "next/link";
 import { useLocale } from "next-intl";
 import type { Article } from "@/services";
 import { formatTimeAgo } from "@/lib/formatTimeAgo";
+import { getArticleUrl } from "@/lib/slug";
 
 interface QuickReadCardProps {
   item: Article;
+  locale?: string;
 }
 
-const QuickReadCard = ({ item }: QuickReadCardProps) => {
-  const locale = useLocale();
+const QuickReadCard = ({ item, locale: propLocale }: QuickReadCardProps) => {
+  const nextIntlLocale = useLocale();
+  const locale = propLocale || nextIntlLocale;
 
   return (
     <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 max-w-sm mx-auto">
@@ -37,7 +40,7 @@ const QuickReadCard = ({ item }: QuickReadCardProps) => {
 
       <div className="p-4">
         {/* Headline */}
-        <h3 className="font-bold text-foreground mb-2 line-clamp-2 text-base leading-tight">
+        <h3 className="font-bold text-foreground mb-2 line-clamp-2 text-base leading-normal">
           {item.title}
         </h3>
 
@@ -56,7 +59,7 @@ const QuickReadCard = ({ item }: QuickReadCardProps) => {
 
         {/* Actions */}
         <div className="flex space-x-2">
-          <Link href={`/${locale}/article/${item.slug}`} className="flex-1">
+          <Link href={getArticleUrl(locale, item)} className="flex-1">
             <Button
               size="sm"
               className="w-full bg-primary hover:bg-primary-hover text-primary-foreground text-sm font-medium"

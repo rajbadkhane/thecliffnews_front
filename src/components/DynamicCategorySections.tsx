@@ -14,6 +14,7 @@ interface Category {
 interface DynamicCategorySectionsProps {
   language: "ENGLISH" | "HINDI";
   excludeCategories?: string[];
+  locale?: string;
 }
 
 interface CategoryWithArticles {
@@ -24,6 +25,7 @@ interface CategoryWithArticles {
 const DynamicCategorySections = ({
   language,
   excludeCategories = [],
+  locale,
 }: DynamicCategorySectionsProps) => {
   const [categoriesWithArticles, setCategoriesWithArticles] = useState<
     CategoryWithArticles[]
@@ -198,6 +200,7 @@ const DynamicCategorySections = ({
             backgroundColor={backgroundColor}
             categorySlug={category.slug}
             maxArticles={maxArticles}
+            locale={locale}
           />
         );
       })}

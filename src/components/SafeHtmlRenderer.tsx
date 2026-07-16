@@ -15,26 +15,29 @@ export function SafeHtmlRenderer({ html, className }: SafeHtmlRendererProps) {
     return <div>No content available</div>;
   }
 
-  // Configure DOMPurify to allow safe HTML elements and attributes
-  const cleanHtml = DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: [
-      'p', 'br', 'strong', 'b', 'em', 'i', 'u', 'strike', 'del',
-      'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-      'ul', 'ol', 'li',
-      'blockquote', 'pre', 'code',
-      'a', 'img',
-      'table', 'thead', 'tbody', 'tr', 'th', 'td',
-      'div', 'span'
-    ],
-    ALLOWED_ATTR: [
-      'href', 'target', 'rel',
-      'src', 'alt', 'width', 'height',
-      'class', 'id',
-      'style',
-      'data-start', 'data-end'
-    ],
-    ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp|data):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i
-  });
+  // Configure DOMPurify to allow safe HTML elements and attributes only in the browser (client-side)
+  let cleanHtml = html;
+  if (typeof window !== 'undefined') {
+    cleanHtml = DOMPurify.sanitize(html, {
+      ALLOWED_TAGS: [
+        'p', 'br', 'strong', 'b', 'em', 'i', 'u', 'strike', 'del',
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+        'ul', 'ol', 'li',
+        'blockquote', 'pre', 'code',
+        'a', 'img',
+        'table', 'thead', 'tbody', 'tr', 'th', 'td',
+        'div', 'span'
+      ],
+      ALLOWED_ATTR: [
+        'href', 'target', 'rel',
+        'src', 'alt', 'width', 'height',
+        'class', 'id',
+        'style',
+        'data-start', 'data-end'
+      ],
+      ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp|data):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i
+    });
+  }
 
 
   // Simplified parse options - no custom replacement for now
