@@ -86,9 +86,9 @@ export default function ArticleStoreFallbackRedirect() {
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-background px-4 text-center">
       <div>
-        <h1 className="text-2xl font-semibold text-foreground">
+        <h2 className="text-2xl font-semibold text-foreground">
           Opening The Cliff News...
-        </h1>
+        </h2>
         <p className="mt-3 text-muted-foreground">
           Redirecting to your app store...
         </p>
