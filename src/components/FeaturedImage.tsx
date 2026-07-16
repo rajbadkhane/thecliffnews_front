@@ -24,7 +24,7 @@ export function FeaturedImage({
   onClick,
   aspectRatio
 }: FeaturedImageProps) {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!priority);
   const [hasError, setHasError] = useState(false);
 
   const aspectRatioClass = aspectRatio || {
