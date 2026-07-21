@@ -15,6 +15,12 @@ interface FeaturedImageProps {
   aspectRatio?: string;
 }
 
+function shouldBypassImageOptimization(src: string): boolean {
+  return src.startsWith(
+    'https://api.thecliffnews.in/uploads/images/'
+  );
+}
+
 export function FeaturedImage({
   src,
   alt,
@@ -84,6 +90,7 @@ export function FeaturedImage({
           isLoading && 'opacity-0'
         )}
         priority={priority}
+        unoptimized={shouldBypassImageOptimization(src)}
         sizes={
           variant === 'hero'
             ? '(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px'
