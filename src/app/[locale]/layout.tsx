@@ -65,6 +65,11 @@ export async function generateMetadata({ params }: GenerateMetadataProps) {
     creator: "The Cliff News",
     publisher: "The Cliff News",
     metadataBase: new URL("https://www.thecliffnews.in"),
+    icons: {
+      icon: "/favicon.png",
+      shortcut: "/favicon.png",
+      apple: "/favicon.png",
+    },
     alternates: {
       canonical: `/${locale}`,
       languages: {
@@ -149,8 +154,6 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/favicon.png" />
-        <link rel="apple-touch-icon" href="/icon.png" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#f97316" />
         <script
