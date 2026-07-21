@@ -22,6 +22,9 @@ export default function robots(): MetadataRoute.Robots {
         disallow: '/api/',
       }
     ],
-    sitemap: 'https://www.thecliffnews.in/sitemap.xml',
+    sitemap: [
+      'https://www.thecliffnews.in/sitemap.xml',
+      'https://www.thecliffnews.in/news-sitemap.xml',
+    ],
   };
 }
