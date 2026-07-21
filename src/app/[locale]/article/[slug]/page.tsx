@@ -2,6 +2,9 @@ import { Metadata } from 'next';
 import ArticleContent from '@/components/ArticleContent';
 import ArticleStoreFallbackRedirect from './ArticleStoreFallbackRedirect';
 import type { Article } from '@/services/articles';
+import { getArticleUrl } from '@/lib/slug';
+
+const SITE_URL = 'https://www.thecliffnews.in';
 
 interface PageProps {
   params: Promise<{
@@ -18,6 +21,10 @@ interface PageProps {
 function stripHtml(html: string): string {
   if (!html) return '';
   return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function getArticleCanonicalUrl(locale: string, article: Article): string {
+  return `${SITE_URL}${getArticleUrl(locale, article)}`;
 }
 
 async function fetchArticle(slug: string, locale: string): Promise<Article | null> {
@@ -47,16 +54,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const excerptText = article.excerpt || article.metaDescription || '';
+  const canonicalUrl = getArticleCanonicalUrl(locale, article);
+  const languageAlternates = {
+    [locale]: canonicalUrl,
+    ...(locale === 'en' ? { 'x-default': canonicalUrl } : {}),
+  };
 
   return {
     title: article.title,
     description: excerptText,
     alternates: {
-      canonical: `/${locale}/article/${slug}`,
-      languages: {
-        en: `/en/article/${slug}`,
-        hi: `/hi/article/${slug}`,
-      },
+      canonical: canonicalUrl,
+      languages: languageAlternates,
     },
     openGraph: {
       title: article.title,
@@ -64,10 +73,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       images: article.featuredImage ? [article.featuredImage] : [],
       type: 'article',
       publishedTime: article.publishedAt,
-      modifiedTime: article.updatedAt || article.publishedAt,
       authors: article.author ? [article.author.name] : [],
       locale: locale === 'hi' ? 'hi_IN' : 'en_US',
-      url: `https://www.thecliffnews.in/${locale}/article/${slug}`,
+      siteName: 'The Cliff News',
+      url: canonicalUrl,
     },
     twitter: {
       card: 'summary_large_image',
@@ -91,14 +100,36 @@ export default async function ArticlePage({ params, searchParams }: PageProps) {
   let jsonLd = null;
   if (article) {
     const cleanBody = stripHtml(article.content);
+    const canonicalUrl = getArticleCanonicalUrl(locale, article);
+    const breadcrumbItems = [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": locale === 'hi' ? 'होम' : 'Home',
+        "item": `${SITE_URL}/${locale}`,
+      },
+      ...(article.category?.slug
+        ? [{
+            "@type": "ListItem",
+            "position": 2,
+            "name": article.category.name,
+            "item": `${SITE_URL}/${locale}/category/${article.category.slug}`,
+          }]
+        : []),
+      {
+        "@type": "ListItem",
+        "position": article.category?.slug ? 3 : 2,
+        "name": article.title,
+        "item": canonicalUrl,
+      },
+    ];
     jsonLd = {
       "@context": "https://schema.org",
       "@type": "NewsArticle",
       "headline": article.title,
       "description": article.excerpt || article.metaDescription || article.title,
       "image": article.featuredImage ? [article.featuredImage] : [],
-      "datePublished": article.publishedAt || article.createdAt,
-      "dateModified": article.updatedAt || article.publishedAt || article.createdAt,
+      "datePublished": article.publishedAt,
       "author": {
         "@type": "Person",
         "name": article.author?.name || "The Cliff News Team"
@@ -111,10 +142,14 @@ export default async function ArticlePage({ params, searchParams }: PageProps) {
           "url": "https://www.thecliffnews.in/dark-logo.png"
         }
       },
-      "mainEntityOfPage": `https://www.thecliffnews.in/${locale}/article/${slug}`,
+      "mainEntityOfPage": canonicalUrl,
       "articleBody": cleanBody,
       "inLanguage": locale === 'hi' ? 'hi-IN' : 'en-US',
-      "keywords": article.tags || ""
+      "keywords": article.tags || "",
+      "breadcrumb": {
+        "@type": "BreadcrumbList",
+        "itemListElement": breadcrumbItems,
+      },
     };
   }
 
