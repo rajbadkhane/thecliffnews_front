@@ -20,6 +20,7 @@ export interface Article {
     publishedAt?: string;
     featuredImage?: string;
     readTime?: number;
+    reporterName?: string;
     isBreaking: boolean;
     isTopStory: boolean; // Backend uses isTopStory instead of isFeatured
     metaTitle?: string;

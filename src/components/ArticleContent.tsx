@@ -236,6 +236,8 @@ export default function ArticleContent({
     );
   }
 
+  const reporterName = article.reporterName?.trim();
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header with Back Button */}
@@ -327,6 +329,15 @@ export default function ArticleContent({
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4" />
               <span>{t('article.minRead', { minutes: article.readTime })}</span>
+            </div>
+          )}
+
+          {reporterName && (
+            <div className="flex items-center gap-2">
+              <span>•</span>
+              <span>
+                {locale === 'hi' ? `संवाददाता: ${reporterName}` : reporterName}
+              </span>
             </div>
           )}
         </div>
