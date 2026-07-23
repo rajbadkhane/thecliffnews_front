@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import ArticleContent from '@/components/ArticleContent';
-import ArticleStoreFallbackRedirect from './ArticleStoreFallbackRedirect';
 import type { Article } from '@/services/articles';
 import { getArticleUrl } from '@/lib/slug';
 
@@ -27,31 +27,52 @@ function getArticleCanonicalUrl(locale: string, article: Article): string {
   return `${SITE_URL}${getArticleUrl(locale, article)}`;
 }
 
-async function fetchArticle(slug: string, locale: string): Promise<Article | null> {
+type ArticleFetchResult =
+  | { article: Article; notFound: false }
+  | { article: null; notFound: true };
+
+async function fetchArticle(slug: string, locale: string): Promise<ArticleFetchResult> {
   const language = locale === 'hi' ? 'HINDI' : 'ENGLISH';
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/articles/slug/${slug}?language=${language}`,
-      { cache: 'no-store' }
-    );
-    if (!response.ok) return null;
-    const data = await response.json();
-    return data?.article || null;
-  } catch (error) {
-    console.error('Error fetching article inside server component:', error);
-    return null;
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/articles/slug/${slug}?language=${language}`,
+    { cache: 'no-store' }
+  );
+
+  if (response.status === 404) {
+    return { article: null, notFound: true };
   }
+
+  if (!response.ok) {
+    throw new Error(`Article request failed: ${response.status}`);
+  }
+
+  const data = await response.json();
+  if (!data?.article) {
+    throw new Error('Article response did not include an article');
+  }
+
+  return { article: data.article, notFound: false };
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug, locale } = await params;
-  const article = await fetchArticle(slug, locale);
+  const result = await fetchArticle(slug, locale);
 
-  if (!article) {
+  if (result.notFound) {
     return {
       title: 'Article Not Found',
+      alternates: {
+        canonical: null,
+        languages: {},
+      },
+      robots: {
+        index: false,
+        follow: true,
+      },
     };
   }
+
+  const article = result.article;
 
   const excerptText = article.excerpt || article.metaDescription || '';
   const canonicalUrl = getArticleCanonicalUrl(locale, article);
@@ -94,7 +115,11 @@ export default async function ArticlePage({ params, searchParams }: PageProps) {
   const inshortsIndex = index;
 
   // Fetch article data on the server for JSON-LD Injection and Server Side Rendering (SSR)
-  const article = await fetchArticle(slug, locale);
+  const result = await fetchArticle(slug, locale);
+  if (result.notFound) {
+    notFound();
+  }
+  const article = result.article;
 
   // Create rich JSON-LD NewsArticle schema
   let jsonLd = null;
@@ -161,13 +186,12 @@ export default async function ArticlePage({ params, searchParams }: PageProps) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       )}
-      <ArticleStoreFallbackRedirect />
       <ArticleContent
         slug={slug}
         locale={locale}
         isFromInshorts={isFromInshorts}
         inshortsIndex={inshortsIndex}
-        initialArticle={article || undefined}
+        initialArticle={article}
       />
     </>
   );

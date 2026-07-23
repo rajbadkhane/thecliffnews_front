@@ -4,7 +4,16 @@
     "details": [
       {
         "appID": "D9752925GN.com.thecliff.news",
-        "paths": ["/en/*", "/hi/*"]
+        "components": [
+          {
+            "/": "/en/article/*",
+            "comment": "English Article URLs"
+          },
+          {
+            "/": "/hi/article/*",
+            "comment": "Hindi Article URLs"
+          }
+        ]
       }
     ]
   }

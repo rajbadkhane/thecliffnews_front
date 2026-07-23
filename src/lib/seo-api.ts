@@ -1,6 +1,7 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 const SEO_REVALIDATE_SECONDS = 300;
 const SEO_FETCH_TIMEOUT_MS = 15_000;
+const SEO_FETCH_RETRIES = 2;
 
 export interface SeoTranslation {
   slug: string;
@@ -154,7 +155,11 @@ function readPositiveInteger(record: UnknownRecord, key: string): number | null 
   return typeof value === 'number' && Number.isInteger(value) && value > 0 ? value : null;
 }
 
-async function fetchSeoJson(endpoint: string): Promise<unknown> {
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchSeoJsonOnce(endpoint: string): Promise<unknown> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), SEO_FETCH_TIMEOUT_MS);
 
@@ -185,6 +190,22 @@ async function fetchSeoJson(endpoint: string): Promise<unknown> {
   } finally {
     clearTimeout(timeoutId);
   }
+}
+
+async function fetchSeoJson(endpoint: string): Promise<unknown> {
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt <= SEO_FETCH_RETRIES; attempt++) {
+    try {
+      return await fetchSeoJsonOnce(endpoint);
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error('SEO API request failed');
+      if (attempt === SEO_FETCH_RETRIES) break;
+      await delay(500 * (attempt + 1));
+    }
+  }
+
+  throw lastError ?? new Error('SEO API request failed');
 }
 
 export async function getSeoArticles(page: number, limit: number): Promise<SeoArticlesPage> {
@@ -257,7 +278,7 @@ export async function getAllSeoArticles(): Promise<SeoArticle[]> {
       pageBatch.map(async (page) => {
         const result = await getSeoArticles(page, pageSize);
 
-        if (result.pagination.pages !== totalPages || result.pagination.page !== page) {
+        if (result.pagination.page !== page) {
           throw new Error(`SEO article pagination metadata changed on page ${page}`);
         }
 

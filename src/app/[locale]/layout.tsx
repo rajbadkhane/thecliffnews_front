@@ -70,13 +70,6 @@ export async function generateMetadata({ params }: GenerateMetadataProps) {
       shortcut: "/favicon.png",
       apple: "/favicon.png",
     },
-    alternates: {
-      canonical: `/${locale}`,
-      languages: {
-        en: "/en",
-        hi: "/hi",
-      },
-    },
     openGraph: {
       type: "website",
       locale: isHi ? "hi_IN" : "en_US",

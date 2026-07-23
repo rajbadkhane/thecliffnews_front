@@ -16,9 +16,7 @@ interface FeaturedImageProps {
 }
 
 function shouldBypassImageOptimization(src: string): boolean {
-  return src.startsWith(
-    'https://api.thecliffnews.in/uploads/images/'
-  );
+  return /^https?:\/\//i.test(src);
 }
 
 export function FeaturedImage({

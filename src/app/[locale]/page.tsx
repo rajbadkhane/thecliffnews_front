@@ -24,6 +24,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: titles[locale as keyof typeof titles] || titles.en,
     description: descriptions[locale as keyof typeof descriptions] || descriptions.en,
+    alternates: {
+      canonical: `/${locale}`,
+      languages: {
+        en: '/en',
+        hi: '/hi',
+      },
+    },
     openGraph: {
       title: titles[locale as keyof typeof titles] || titles.en,
       description: descriptions[locale as keyof typeof descriptions] || descriptions.en,
