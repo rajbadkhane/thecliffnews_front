@@ -63,13 +63,11 @@ export default function AppPromotionPanel() {
   const copy = locale === "hi" ? COPY.hi : COPY.en;
   const isPreviewMode = searchParams.get("appPromoPreview") === "1";
   const isDevelopment = process.env.NODE_ENV === "development";
-  const canPreviewOnDesktop = isDevelopment || isPreviewMode;
   const isSupportedRoute = useMemo(
     () => isSupportedPublicRoute(pathname),
     [pathname]
   );
   const [isDismissed, setIsDismissed] = useState(true);
-  const [isEligibleViewport, setIsEligibleViewport] = useState(false);
   const [isTriggered, setIsTriggered] = useState(false);
   const fallbackTimerRef = useRef<number | null>(null);
   const appOpenedRef = useRef(false);
@@ -79,19 +77,6 @@ export default function AppPromotionPanel() {
       !isPreviewMode && sessionStorage.getItem(DISMISS_KEY) === "1"
     );
   }, [isPreviewMode, pathname]);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 768px)");
-    const updateViewport = () =>
-      setIsEligibleViewport(mediaQuery.matches || canPreviewOnDesktop);
-
-    updateViewport();
-    mediaQuery.addEventListener("change", updateViewport);
-
-    return () => {
-      mediaQuery.removeEventListener("change", updateViewport);
-    };
-  }, [canPreviewOnDesktop]);
 
   useEffect(() => {
     setIsTriggered(false);
@@ -142,7 +127,7 @@ export default function AppPromotionPanel() {
   }, []);
 
   const isVisible =
-    isSupportedRoute && !isDismissed && isEligibleViewport && isTriggered;
+    isSupportedRoute && !isDismissed && isTriggered;
 
   useEffect(() => {
     if (!isDevelopment) return;
@@ -150,7 +135,6 @@ export default function AppPromotionPanel() {
     let reason = "currently visible";
     if (!isSupportedRoute) reason = "unsupported route";
     else if (isDismissed) reason = "session dismissal";
-    else if (!isEligibleViewport) reason = "desktop breakpoint";
     else if (!isTriggered) reason = "not yet triggered";
 
     console.info(`[AppPromotionPanel] ${reason}`);
@@ -158,7 +142,6 @@ export default function AppPromotionPanel() {
     isDevelopment,
     isSupportedRoute,
     isDismissed,
-    isEligibleViewport,
     isTriggered,
   ]);
 
@@ -182,13 +165,11 @@ export default function AppPromotionPanel() {
     return null;
   }
 
-  const desktopPreviewClass = canPreviewOnDesktop ? "" : "md:hidden";
-
   return (
     <>
       <aside
         aria-label="The Cliff News app promotion"
-        className={`fixed inset-x-0 bottom-3 z-[70] px-3 ${desktopPreviewClass} motion-safe:animate-in motion-safe:slide-in-from-bottom-6 motion-safe:duration-300`}
+        className="fixed inset-x-0 bottom-3 z-[70] px-3 motion-safe:animate-in motion-safe:slide-in-from-bottom-6 motion-safe:duration-300"
       >
         <div className="relative mx-auto max-w-[500px] overflow-hidden rounded-3xl border border-orange-300/70 bg-white/82 px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 text-neutral-950 shadow-[0_18px_60px_rgba(92,45,0,0.22),0_0_24px_rgba(249,115,22,0.2)] backdrop-blur-md">
           <button
@@ -257,7 +238,7 @@ export default function AppPromotionPanel() {
       </aside>
       <div
         aria-hidden="true"
-        className={`h-[150px] ${desktopPreviewClass}`}
+        className="h-[150px]"
       />
     </>
   );
