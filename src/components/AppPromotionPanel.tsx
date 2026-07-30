@@ -189,6 +189,7 @@ export default function AppPromotionPanel() {
               height={533}
               className="h-20 w-full object-contain sm:h-24"
               priority={false}
+              unoptimized
             />
           </div>
 
