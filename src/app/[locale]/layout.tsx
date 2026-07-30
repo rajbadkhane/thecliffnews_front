@@ -6,6 +6,7 @@ import Script from 'next/script';
 import { Providers } from '@/components/Providers';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import AppPromotionPanel from '@/components/AppPromotionPanel';
 import '../globals.css';
 
 const inter = Inter({
@@ -177,6 +178,7 @@ export default async function LocaleLayout({
             <Header />
             {children}
             <Footer />
+            <AppPromotionPanel />
           </Providers>
         </NextIntlClientProvider>
       </body>
