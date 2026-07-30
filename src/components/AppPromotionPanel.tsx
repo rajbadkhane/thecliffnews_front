@@ -9,7 +9,7 @@ const PLAY_STORE_URL =
   "https://play.google.com/store/apps/details?id=com.thecliffnews";
 const APP_STORE_URL =
   "https://apps.apple.com/us/app/the-cliff-news/id6746549944";
-const BANNER_IMAGE_SRC = "/promotinoal-banner.jpeg";
+const BANNER_IMAGE_SRC = "/promotional-banner.jpeg";
 const CHROME_ICON_SRC =
   "https://www.google.com/chrome/static/images/chrome-logo.svg";
 const DISMISS_KEY = "the-cliff-news:article-app-promo-dismissed";
