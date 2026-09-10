@@ -151,6 +151,11 @@ export default async function LocaleLayout({
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#f97316" />
         <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2699826701665381"
+          crossOrigin="anonymous"
+        />
+        <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
