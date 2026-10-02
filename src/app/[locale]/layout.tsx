@@ -105,7 +105,7 @@ export async function generateMetadata({ params }: GenerateMetadataProps) {
       },
     },
     verification: {
-      google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION || "your-google-verification-code",
+      google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION,
     },
   };
 }
